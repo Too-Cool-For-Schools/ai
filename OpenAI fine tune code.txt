@@ -1,0 +1,128 @@
+import openai
+import os
+import re
+
+# Set OpenAI API key
+openai.api_key = "YOUR_API_KEY"
+
+# Set fine-tuning parameters
+model = "text-davinci-002"
+temperature = 0.5
+max_tokens = 2048
+batch_size = 1
+epochs = 5
+
+# Load training data from a text file
+with open("training_data.txt", "r") as f:
+    text_data = f.read()
+
+# Preprocess the text data
+text_data = re.sub(r"\n+", "\n", text_data) # remove multiple newlines
+text_data = re.sub(r"\n( )+", "\n", text_data) # remove leading whitespace
+text_data = re.sub(r"\n+", "\n", text_data) # remove trailing whitespace
+text_data = text_data.strip() # remove leading/trailing whitespace
+
+# Split text data into training and validation sets
+split_ratio = 0.8 # 80/20 split
+text_data_lines = text_data.split("\n")
+split_idx = int(len(text_data_lines) * split_ratio)
+train_data = "\n".join(text_data_lines[:split_idx])
+valid_data = "\n".join(text_data_lines[split_idx:])
+
+# Fine-tune the GPT-3 model on the training data
+for epoch in range(epochs):
+    print(f"Epoch {epoch+1}/{epochs}...")
+    response = openai.Completion.create(
+        engine=model,
+        prompt=train_data,
+        max_tokens=max_tokens,
+        temperature=temperature,
+        n=batch_size,
+        stop=None,
+        frequency_penalty=0,
+        presence_penalty=0,
+        best_of=1,
+        fine_tune=True,
+        prompt_suffix="\nGPT-3:"
+    )
+    completions = response.choices
+    text = completions[0].text
+    train_loss = response.get("loss")
+    print(f"Train loss: {train_loss}")
+
+# Evaluate the fine-tuned model on the validation data
+valid_losses = []
+for prompt in valid_data.split("\n"):
+    response = openai.Completion.create(
+        engine=model,
+        prompt=f"{prompt}\nGPT-3:",
+        max_tokens=max_tokens,
+        temperature=temperature,
+        n=batch_size,
+        stop=None,
+        frequency_penalty=0,
+        presence_penalty=0,
+        best_of=1,
+        fine_tune=False,
+    )
+    completion = response.choices[0].text.strip()
+    valid_loss = response.get("loss")
+    valid_losses.append(valid_loss)
+
+print(f"Validation loss: {sum(valid_losses) / len(valid_losses)}")
+In this code, we first import the openai package and set our API key. We also set the fine-tuning parameters, such as the GPT-3 model to use (text-davinci-002), the temperature (0.5), the maximum number of tokens (2048), and the batch size (1). We also set the number of epochs to train for (5).
+
+Next, we load the training data from a text file and preprocess it by removing unnecessary whitespace characters. We split the preprocessed data into training and validation sets using an 80/20 split ratio.
+
+We then fine-tune the GPT-3 model on the training data using the openai.Completion.create method, setting the fine_tune flag to True. We loop through the epochs and send requests to the API with the training data as the prompt. We use the train_loss returned
+
+
+
+
+
+Arkar Nyan Hein
+what is os package used for
+The os package is a built-in Python package that provides a way to interact with the operating system. It provides a range of useful functions to work with files and directories, process environment variables, and execute system commands.
+
+Here are some examples of what the os package can be used for:
+
+Accessing files and directories: os provides functions for creating, renaming, moving, and deleting files and directories on the local filesystem.
+Working with the process environment: os provides functions to get and set environment variables, and to retrieve information about the current process, such as its ID and the current working directory.
+Interacting with the operating system: os provides functions to execute shell commands, change file permissions, and manipulate system processes.
+Overall, the os package is a powerful tool for Python programmers who need to interact with the underlying operating system.
+
+
+
+
+
+Arkar Nyan Hein
+what is re package
+The re (regular expression) package is a built-in Python package that provides support for regular expressions. Regular expressions are a powerful tool for pattern matching and text manipulation. The re package allows you to search for and manipulate text based on a wide range of patterns.
+
+Here are some common use cases for the re package:
+
+Searching for patterns in text: The re.search() function allows you to search for a specific pattern in a string.
+Extracting data from text: The re.findall() function allows you to extract all occurrences of a pattern in a string and return them as a list.
+Replacing text: The re.sub() function allows you to replace all occurrences of a pattern in a string with a new string.
+Here's an example of using the re package to search for a pattern in a string:
+
+python
+Copy code
+import re
+
+text = "The quick brown fox jumps over the lazy dog."
+
+match = re.search(r"fox", text)
+
+if match:
+    print("Found a match!")
+else:
+    print("No match found.")
+In this example, we're using the re.search() function to search for the pattern "fox" in the text string. If the pattern is found, the function returns a Match object, which we can use to extract information about the match. If the pattern is not found, the function returns None.
+
+
+
+
+
+
+Regenerate response
